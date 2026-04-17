@@ -927,7 +927,21 @@ Understood. I appreciate your time.`;
     }
 
     loadScript();
-    renderAll();
+    renderAll(); function updateStats() {
+  let leads = JSON.parse(localStorage.getItem("ssag") || "[]")
+
+  let total = leads.length
+  let interested = leads.filter(l => l.result === "Interested").length
+  let booked = leads.filter(l => l.result === "Booked").length
+  let callback = leads.filter(l => l.result === "Callback").length
+  let noanswer = leads.filter(l => l.result === "No Answer").length
+
+  document.getElementById("totalLeads").innerText = total
+  document.getElementById("interested").innerText = interested
+  document.getElementById("booked").innerText = booked
+  document.getElementById("callback").innerText = callback
+  document.getElementById("noanswer").innerText = noanswer
+}
   </script>
 </body>
 </html>

@@ -1,60 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SSAG AI Call System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      background:#0b0f19;
-      color:white;
-      font-family:Arial;
-      text-align:center;
-      padding:40px;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #050b16 0%, #091224 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      padding: 18px;
     }
-    input, button {
-      padding:15px;
-      margin:10px;
-      width:90%;
-      max-width:400px;
-      border-radius:10px;
-      border:none;
-      font-size:18px;
+
+    .app {
+      max-width: 720px;
+      margin: 0 auto;
+      background: rgba(14, 22, 40, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
     }
-    button {
-      background:#00ff99;
-      font-weight:bold;
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
     }
-  </style>
-</head>
-<body>
 
-<h2>SSAG AI Call System</h2>
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-<input id="phone" placeholder="Enter phone number">
-<input id="name" placeholder="Name">
-
-<button onclick="makeCall()">CALL</button>
-
-<script>
-function makeCall() {
-  const phone = document.getElementById("phone").value;
-  const name = document.getElementById("name").value;
-
-  fetch("YOUR_BLAND_API_URL", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      phone: phone,
-      name: name,
-      task: "Call this person. Ask if they use phones for business and if they'd be open to improving mobile security. Keep it short and natural."
-    })
-  });
-
-  alert("Call Sent");
-}
-</script>
-
-</body>
-</html>
+    .

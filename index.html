@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SSAG AI Call System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background:#0b0f19;
+      color:white;
+      font-family:Arial;
+      text-align:center;
+      padding:40px;
+    }
+    input, button {
+      padding:15px;
+      margin:10px;
+      width:90%;
+      max-width:400px;
+      border-radius:10px;
+      border:none;
+      font-size:18px;
+    }
+    button {
+      background:#00ff99;
+      font-weight:bold;
+    }
+  </style>
+</head>
+<body>
+
+<h2>SSAG AI Call System</h2>
+
+<input id="phone" placeholder="Enter phone number">
+<input id="name" placeholder="Name">
+
+<button onclick="makeCall()">CALL</button>
+
+<script>
+function makeCall() {
+  const phone = document.getElementById("phone").value;
+  const name = document.getElementById("name").value;
+
+  fetch("YOUR_BLAND_API_URL", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      phone: phone,
+      name: name,
+      task: "Call this person. Ask if they use phones for business and if they'd be open to improving mobile security. Keep it short and natural."
+    })
+  });
+
+  alert("Call Sent");
+}
+</script>
+
+</body>
+</html>

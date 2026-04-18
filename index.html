@@ -1,19 +1,374 @@
-STEP 1 — ADD “AUTO NEXT LEAD” (SPEED BOOST)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSAG Call System</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #050b1a;
+      color: white;
+      padding: 12px;
+    }
 
-Right now you:
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
 
-call
-save
-manually reset
+    .card {
+      background: #0e1830;
+      padding: 15px;
+      border-radius: 15px;
+      margin-bottom: 15px;
+    }
 
-We fix that.
+    h1, h3 {
+      margin-top: 0;
+    }
 
-👉 Inside your saveLead() function, at the VERY END, add:
+    h1 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
 
-document.getElementById("name").value = ""
-document.getElementById("phone").value = ""
-document.getElementById("company").value = ""
-document.getElementById("notes").value = ""
-currentResult = ""
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
 
-✔ Now every save resets instantly
+    .stat-box {
+      background: #132142;
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #b9c7e6;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      margin-top: 8px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .call {
+      background: #12f59a;
+      color: black;
+    }
+
+    .save {
+      background: #1e2c4f;
+      color: white;
+    }
+
+    .result {
+      background: #18294f;
+      color: white;
+      margin: 5px 0;
+    }
+
+    .active {
+      background: #12f59a !important;
+      color: black !important;
+    }
+
+    .notes {
+      min-height: 100px;
+    }
+
+    .lead {
+      background: #0c1428;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+
+    .lead button {
+      margin-top: 8px;
+    }
+
+    .script-box {
+      background: #091121;
+      padding: 12px;
+      border-radius: 10px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .status-box {
+      background: #132142;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 640px) {
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h1>SSAG Call System</h1>
+
+    <div class="card">
+      <h3>Dashboard</h3>
+      <div class="stats">
+        <div class="stat-box">
+          <div class="stat-label">Total Leads</div>
+          <div class="stat-value" id="totalLeads">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Interested</div>
+          <div class="stat-value" id="interested">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Booked</div>
+          <div class="stat-value" id="booked">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Callback</div>
+          <div class="stat-value" id="callback">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">No Answer</div>
+          <div class="stat-value" id="noanswer">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Not Interested</div>
+          <div class="stat-value" id="notinterested">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Lead Entry</h3>
+
+      <input id="name" placeholder="Lead Name" />
+      <input id="phone" placeholder="Phone Number" />
+      <input id="company" placeholder="Company" />
+
+      <select id="service">
+        <option>Mobile Security</option>
+        <option>Phone Risk Review</option>
+        <option>Account Protection</option>
+      </select>
+
+      <button class="call" onclick="callLead()">CALL</button>
+      <button class="save" onclick="saveLead()">SAVE LEAD</button>
+
+      <div id="statusBox" class="status-box">Ready.</div>
+    </div>
+
+    <div class="card">
+      <h3>Script</h3>
+      <div id="scriptBox" class="script-box">Tap CALL to load script</div>
+    </div>
+
+    <div class="card">
+      <h3>Result</h3>
+
+      <button class="result" onclick="setResult(this,'Interested')">Interested</button>
+      <button class="result" onclick="setResult(this,'Not Interested')">Not Interested</button>
+      <button class="result" onclick="setResult(this,'Callback')">Callback</button>
+      <button class="result" onclick="setResult(this,'Booked')">Booked</button>
+      <button class="result" onclick="setResult(this,'No Answer')">No Answer</button>
+      <button class="result" onclick="setResult(this,'Wrong Number')">Wrong Number</button>
+    </div>
+
+    <div class="card">
+      <h3>Notes</h3>
+      <textarea id="notes" class="notes" placeholder="Enter notes here"></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Saved Leads</h3>
+      <div id="leads"></div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentResult = "";
+    let callStart = null;
+
+    function updateStatus(message) {
+      document.getElementById("statusBox").innerText = message;
+    }
+
+    function loadScript() {
+      let name = document.getElementById("name").value || "there";
+      let service = document.getElementById("service").value;
+
+      let script =
+`Hi is this ${name}?
+
+This is Cezar with SSAG.
+
+Quick question — are you using your phone for business accounts, payments, logins, or customer communication?
+
+We help businesses tighten up ${service.toLowerCase()} and reduce mobile-related access risks.
+
+Would you be open to a quick follow-up conversation?`;
+
+      document.getElementById("scriptBox").innerText = script;
+    }
+
+    function callLead() {
+      let phone = document.getElementById("phone").value.trim();
+
+      if (!phone) {
+        alert("Enter phone number");
+        return;
+      }
+
+      callStart = Date.now();
+      loadScript();
+      updateStatus("Opening dialer...");
+      window.location.href = "tel:" + phone;
+    }
+
+    function setResult(btn, result) {
+      currentResult = result;
+
+      document.querySelectorAll(".result").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      updateStatus("Result selected: " + result);
+    }
+
+    function saveLead() {
+      let duration = callStart ? Math.floor((Date.now() - callStart) / 1000) : 0;
+
+      let lead = {
+        name: document.getElementById("name").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        company: document.getElementById("company").value.trim(),
+        service: document.getElementById("service").value,
+        result: currentResult,
+        notes: document.getElementById("notes").value.trim(),
+        duration: duration,
+        savedAt: new Date().toLocaleString()
+      };
+
+      if (!lead.phone) {
+        alert("Need phone number");
+        return;
+      }
+
+      let leads = JSON.parse(localStorage.getItem("ssag") || "[]");
+
+      leads.unshift(lead);
+
+      localStorage.setItem("ssag", JSON.stringify(leads));
+
+      renderLeads();
+      updateStats();
+
+      document.getElementById("name").value = "";
+      document.getElementById("phone").value = "";
+      document.getElementById("company").value = "";
+      document.getElementById("notes").value = "";
+      document.getElementById("service").selectedIndex = 0;
+      currentResult = "";
+      callStart = null;
+      document.querySelectorAll(".result").forEach(b => b.classList.remove("active"));
+      document.getElementById("scriptBox").innerText = "Tap CALL to load script";
+
+      updateStatus("Lead saved. Form reset for next lead.");
+    }
+
+    function renderLeads() {
+      let leads = JSON.parse(localStorage.getItem("ssag") || "[]");
+      let html = "";
+
+      leads.forEach((l, i) => {
+        html += `
+          <div class="lead">
+            <b>${escapeHtml(l.name || "No Name")}</b><br>
+            ${escapeHtml(l.phone || "")}<br>
+            ${escapeHtml(l.company || "")}<br>
+            Result: ${escapeHtml(l.result || "")}<br>
+            Service: ${escapeHtml(l.service || "")}<br>
+            Duration: ${l.duration || 0}s<br>
+            Saved: ${escapeHtml(l.savedAt || "")}<br>
+            <button class="call" onclick="dial('${escapeJs(l.phone)}')">Call</button>
+          </div>
+        `;
+      });
+
+      document.getElementById("leads").innerHTML = html || "No saved leads yet.";
+    }
+
+    function updateStats() {
+      let leads = JSON.parse(localStorage.getItem("ssag") || "[]");
+
+      let total = leads.length;
+      let interested = leads.filter(l => l.result === "Interested").length;
+      let booked = leads.filter(l => l.result === "Booked").length;
+      let callback = leads.filter(l => l.result === "Callback").length;
+      let noanswer = leads.filter(l => l.result === "No Answer").length;
+      let notinterested = leads.filter(l => l.result === "Not Interested").length;
+
+      document.getElementById("totalLeads").innerText = total;
+      document.getElementById("interested").innerText = interested;
+      document.getElementById("booked").innerText = booked;
+      document.getElementById("callback").innerText = callback;
+      document.getElementById("noanswer").innerText = noanswer;
+      document.getElementById("notinterested").innerText = notinterested;
+    }
+
+    function dial(num) {
+      window.location.href = "tel:" + num;
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeJs(text) {
+      return String(text).replace(/'/g, "\\'");
+    }
+
+    renderLeads();
+    updateStats();
+  </script>
+</body>
+</html>

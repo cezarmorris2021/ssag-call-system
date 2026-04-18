@@ -1,51 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSAG Call Command Center</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0b0f19;
+  color: #fff;
+}
+.container {
+  max-width: 720px;
+  margin: auto;
+  padding: 18px;
+}
+.card {
+  background: #111827;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+h1, h2 {
+  margin-top: 0;
+}
+h1 {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.sub {
+  color: #a7b0c0;
+  font-size: 13px;
+  margin-top: -8px;
+  margin-bottom: 12px;
+}
+input, textarea, select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 6px;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 8px;
+  cursor: pointer;
+}
+.green { background: #00e676; color: #000; }
+.blue { background: #2196f3; color: #fff; }
+.red { background: #d50000; color: #fff; }
+.yellow { background: #ffb300; color: #000; }
+.gray { background: #616161; color: #fff; }
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.result-btn.active {
+  outline: 3px solid #fff;
+}
+.status {
+  margin-top: 10px;
+  background: #1f2937;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+.script-box {
+  white-space: pre-wrap;
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 12px;
+  line-height: 1.5;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.stat {
+  background: #0f172a;
+  padding: 12px;
+  border-radius: 12px;
+  text-align: center;
+}
+.stat .num {
+  font-size: 24px;
+  font-weight: bold;
+}
+.lead {
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 10px;
+}
+.lead .name {
+  font-weight: bold;
+  font-size: 16px;
+}
+.small {
+  font-size: 13px;
+  color: #c6d0e0;
+  margin-top: 4px;
+}
+.lead-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+.small-btn {
+  padding: 10px;
+  font-size: 13px;
+}
+.hidden {
+  display: none;
+}
+@media (max-width: 640px) {
+  .row2, .result-grid, .stat-grid, .lead-actions {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>SSAG Call Command Center</h1>
+
+  <div class="card">
+    <h2>Settings</h2>
+    <div class="sub">Paste your Google Apps Script web app link here once, then save it. You will not need to edit the code again.</div>
+    <label>Webhook URL</label>
+    <input id="webhookUrl" placeholder="Paste your https://script.google.com/macros/s/.../exec link here">
+    <button class="blue" onclick="saveSettings()">SAVE SETTINGS</button>
+    <div id="settingsStatus" class="status">No webhook saved yet.</div>
+  </div>
+
+  <div class="card">
+    <h2>Dashboard</h2>
+    <div class="stat-grid">
+      <div class="stat">
+        <div>Total</div>
+        <div class="num" id="statTotal">0</div>
+      </div>
+      <div class="stat">
+        <div>Interested</div>
+        <div class="num" id="statInterested">0</div>
+      </div>
+      <div class="stat">
+        <div>Callback</div>
+        <div class="num" id="statCallback">0</div>
+      </div>
+      <div class="stat">
+        <div>Booked</div>
+        <div class="num" id="statBooked">0</div>
+      </div>
+      <div class="stat">
+        <div>No Answer</div>
+        <div class="num" id="statNoAnswer">0</div>
+      </div>
+      <div class="stat">
+        <div>Not Interested</div>
+        <div class="num" id="statNotInterested">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Lead Entry</h2>
+
+    <label>Lead Name</label>
+    <input id="name" placeholder="Lead Name">
+
+    <label>Phone Number</label>
+    <input id="phone" placeholder="Phone Number">
+
+    <label>Company</label>
+    <input id="company" placeholder="Company">
+
+    <div class="row2">
+      <div>
+        <label>Callback Date</label>
+        <input id="callbackDate" type="date">
+      </div>
+      <div>
+        <label>Callback Time</label>
+        <input id="callbackTime" type="time">
+      </div>
+    </div>
+
+    <label>Notes</label>
+    <textarea id="notes" placeholder="Notes"></textarea>
+
+    <button class="green" onclick="callLead()">ONE-TAP DIAL</button>
+    <button class="blue" onclick="saveLead()">SAVE LEAD</button>
+    <button class="yellow" onclick="saveAsCallback()">SAVE AS CALLBACK</button>
+    <button class="gray" onclick="loadNextLead()">LOAD NEXT LEAD</button>
+    <button class="red" onclick="clearForm()">CLEAR FORM</button>
+
+    <div id="mainStatus" class="status">Ready.</div>
+  </div>
+
+  <div class="card">
+    <h2>On-Screen Script</h2>
+    <div id="scriptBox" class="script-box">Tap ONE-TAP DIAL to load the script.</div>
+    <button class="blue" onclick="refreshScript()">REFRESH SCRIPT</button>
+  </div>
+
+  <div class="card">
+    <h2>Call Result</h2>
+    <div class="result-grid">
+      <button id="btnInterested" class="green result-btn" onclick="setResult('Interested', this)">Interested</button>
+      <button id="btnNotInterested" class="red result-btn" onclick="setResult('Not Interested', this)">Not Interested</button>
+      <button id="btnCallback" class="yellow result-btn" onclick="setResult('Callback', this)">Callback</button>
+      <button id="btnBooked" class="blue result-btn" onclick="setResult('Booked', this)">Booked</button>
+      <button id="btnNoAnswer" class="gray result-btn" onclick="setResult('No Answer', this)">No Answer</button>
+      <button id="btnVoicemail" class="gray result-btn" onclick="setResult('Voicemail Left', this)">Voicemail Left</button>
+    </div>
+    <div id="resultStatus" class="status">Selected result: None</div>
+  </div>
+
+  <div class="card">
+    <h2>Bulk Lead Add</h2>
+    <div class="sub">Paste one lead per line. You can paste just a phone number, or Name, Phone, Company</div>
+    <textarea id="bulkInput" placeholder="5204200127&#10;John Smith, 6025551111, Smith HVAC&#10;Jane, 5201112222, Desert Clean"></textarea>
+    <button class="blue" onclick="bulkAdd()">ADD BULK LEADS</button>
+  </div>
+
+  <div class="card">
+    <h2>Callback Queue</h2>
+    <div id="callbackQueue"></div>
+  </div>
+
+  <div class="card">
+    <h2>Saved Leads</h2>
+    <button class="blue" onclick="exportJson()">EXPORT JSON</button>
+    <button class="blue" onclick="exportCsv()">EXPORT CSV</button>
+    <button class="red" onclick="clearAllLeads()">DELETE ALL LEADS</button>
+    <div id="savedLeads"></div>
+  </div>
+
+</div>
+
 <script>
-const WEBHOOK_URL = "https://script.google.com/macros/s/XXXX/exec"
+let currentResult = "";
+let callStart = null;
 
-let currentResult = ""
-
-function callLead() {
-  const phone = document.getElementById("phone").value
-  if (!phone) return alert("Enter phone number")
-
-  window.location.href = "tel:" + phone
+function getWebhook() {
+  return localStorage.getItem("ssag_webhook") || "";
 }
 
-function setResult(result) {
-  currentResult = result
-  alert("Result set: " + result)
+function saveSettings() {
+  const url = document.getElementById("webhookUrl").value.trim();
+  if (!url) {
+    document.getElementById("settingsStatus").innerText = "Paste the webhook link first.";
+    return;
+  }
+  localStorage.setItem("ssag_webhook", url);
+  document.getElementById("settingsStatus").innerText = "Webhook saved.";
+}
+
+function loadSettings() {
+  const url = getWebhook();
+  if (url) {
+    document.getElementById("webhookUrl").value = url;
+    document.getElementById("settingsStatus").innerText = "Webhook loaded.";
+  } else {
+    document.getElementById("settingsStatus").innerText = "No webhook saved yet.";
+  }
+}
+
+function getLeads() {
+  return JSON.parse(localStorage.getItem("ssag_leads") || "[]");
+}
+
+function setLeads(leads) {
+  localStorage.setItem("ssag_leads", JSON.stringify(leads));
+}
+
+function setStatus(msg) {
+  document.getElementById("mainStatus").innerText = msg;
+}
+
+function sanitizePhone(phone) {
+  return String(phone || "").replace(/[^0-9+]/g, "");
+}
+
+function refreshScript() {
+  const name = document.getElementById("name").value.trim() || "[NAME]";
+  const company = document.getElementById("company").value.trim();
+
+  const script = `Hi, is this ${name}?
+
+This is Cezar with SSAG.
+
+Quick reason for the call — we help businesses reduce mobile phone risk, account access problems, and weak spots around device use${company ? " for companies like " + company : ""}.
+
+I wanted to ask:
+1. Do you or your team use phones for customer communication, business logins, payments, or account access?
+2. Are those company phones, personal phones, or both?
+3. Have you had any issues with suspicious texts, login problems, phishing, or lost devices?
+4. Would you be open to a quick follow-up review to see if anything needs tightening up?
+
+If interested:
+Perfect. Let’s set a quick follow-up.
+
+If busy:
+No problem. What day and time works better?
+
+If not interested:
+Understood. I appreciate your time.`;
+
+  document.getElementById("scriptBox").innerText = script;
+}
+
+function callLead() {
+  const phone = sanitizePhone(document.getElementById("phone").value);
+  if (!phone) {
+    alert("Enter phone number");
+    return;
+  }
+  callStart = Date.now();
+  refreshScript();
+  window.location.href = "tel:" + phone;
+}
+
+function setResult(result, btn) {
+  currentResult = result;
+  document.querySelectorAll(".result-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("resultStatus").innerText = "Selected result: " + result;
+}
+
+function makeLeadObject() {
+  const callbackDate = document.getElementById("callbackDate").value;
+  const callbackTime = document.getElementById("callbackTime").value;
+  const duration = callStart ? Math.floor((Date.now() - callStart) / 1000) : 0;
+
+  return {
+    id: Date.now(),
+    name: document.getElementById("name").value.trim(),
+    phone: sanitizePhone(document.getElementById("phone").value.trim()),
+    company: document.getElementById("company").value.trim(),
+    notes: document.getElementById("notes").value.trim(),
+    result: currentResult,
+    callbackDate,
+    callbackTime,
+    duration,
+    savedAt: new Date().toLocaleString()
+  };
 }
 
 function saveLead() {
-  const name = document.getElementById("name").value
-  const phone = document.getElementById("phone").value
-  const company = document.getElementById("company").value
-  const notes = document.getElementById("notes").value
-
-  if (!phone) {
-    alert("Phone required")
-    return
+  const lead = makeLeadObject();
+  if (!lead.phone) {
+    alert("Phone required");
+    return;
   }
 
-  fetch(WEBHOOK_URL, {
+  let leads = getLeads();
+  const existingIndex = leads.findIndex(l => sanitizePhone(l.phone) === lead.phone);
+
+  if (existingIndex > -1) {
+    leads[existingIndex] = { ...leads[existingIndex], ...lead, id: leads[existingIndex].id };
+  } else {
+    leads.unshift(lead);
+  }
+
+  setLeads(leads);
+  sendToWebhook(lead);
+  renderAll();
+  clearForm();
+  setStatus("Lead saved.");
+}
+
+function saveAsCallback() {
+  currentResult = "Callback";
+  document.getElementById("resultStatus").innerText = "Selected result: Callback";
+  saveLead();
+}
+
+function sendToWebhook(lead) {
+  const webhook = getWebhook();
+  if (!webhook) {
+    setStatus("Saved locally. Add webhook in Settings to send to Google Sheet.");
+    return;
+  }
+
+  fetch(webhook, {
     method: "POST",
     body: JSON.stringify({
-      name,
-      phone,
-      company,
-      notes,
-      result: currentResult
+      name: lead.name,
+      phone: lead.phone,
+      company: lead.company,
+      notes: lead.notes,
+      result: lead.result
     })
-  })
-  .then(() => {
-    alert("Lead saved to system")
-
-    // CLEAR FORM (AUTO NEXT LEAD)
-    document.getElementById("name").value = ""
-    document.getElementById("phone").value = ""
-    document.getElementById("company").value = ""
-    document.getElementById("notes").value = ""
-    currentResult = ""
-  })
-  .catch(() => alert("Error saving lead"))
+  }).catch(() => {
+    setStatus("Saved locally. Webhook send failed.");
+  });
 }
+
+function bulkAdd() {
+  const raw = document.getElementById("bulkInput").value.trim();
+  if (!raw) {
+    alert("Paste leads first");
+    return;
+  }
+
+  let leads = getLeads();
+  let added = 0;
+
+  raw.split("\n").forEach(line => {
+    const clean = line.trim();
+    if (!clean) return;
+
+    const parts = clean.split(",").map(x => x.trim());
+    let name = "Unknown";
+    let phone = "";
+    let company = "";
+
+    if (parts.length === 1) {
+      phone = sanitizePhone(parts[0]);
+    } else if (parts.length === 2) {
+      name = parts[0];
+      phone = sanitizePhone(parts[1]);
+    } else {
+      name = parts[0];
+      phone = sanitizePhone(parts[1]);
+      company = parts.slice(2).join(", ");
+    }
+
+    if (!phone) return;
+
+    const exists = leads.find(l => sanitizePhone(l.phone) === phone);
+    if (!exists) {
+      leads.unshift({
+        id: Date.now() + Math.random(),
+        name,
+        phone,
+        company,
+        notes: "",
+        result: "",
+        callbackDate: "",
+        callbackTime: "",
+        duration: 0,
+        savedAt: new Date().toLocaleString()
+      });
+      added++;
+    }
+  });
+
+  setLeads(leads);
+  document.getElementById("bulkInput").value = "";
+  renderAll();
+  setStatus("Bulk leads added: " + added);
+}
+
+function clearForm() {
+  document.getElementById("name").value = "";
+  document.getElementById("phone").value = "";
+  document.getElementById("company").value = "";
+  document.getElementById("notes").value = "";
+  document.getElementById("callbackDate").value = "";
+  document.getElementById("callbackTime").value = "";
+  currentResult = "";
+  callStart = null;
+  document.querySelectorAll(".result-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("resultStatus").innerText = "Selected result: None";
+  document.getElementById("scriptBox").innerText = "Tap ONE-TAP DIAL to load the script.";
+}
+
+function loadLead(index) {
+  const leads = getLeads();
+  const lead = leads[index];
+  if (!lead) return;
+
+  document.getElementById("name").value = lead.name || "";
+  document.getElementById("phone").value = lead.phone || "";
+  document.getElementById("company").value = lead.company || "";
+  document.getElementById("notes").value = lead.notes || "";
+  document.getElementById("callbackDate").value = lead.callbackDate || "";
+  document.getElementById("callbackTime").value = lead.callbackTime || "";
+  currentResult = lead.result || "";
+
+  refreshScript();
+  document.getElementById("resultStatus").innerText = "Selected result: " + (currentResult || "None");
+}
+
+function loadNextLead() {
+  const leads = getLeads();
+  const next = leads.find(l => !l.result || l.result === "No Answer" || l.result === "Voicemail Left" || l.result === "Callback");
+  if (!next) {
+    setStatus("No next lead found.");
+    return;
+  }
+  const index = leads.findIndex(l => l.id === next.id);
+  loadLead(index);
+  setStatus("Next lead loaded.");
+}
+
+function dialSaved(index) {
+  const leads = getLeads();
+  const lead = leads[index];
+  if (!lead || !lead.phone) return;
+  window.location.href = "tel:" + sanitizePhone(lead.phone);
+}
+
+function deleteLead(index) {
+  const leads = getLeads();
+  leads.splice(index, 1);
+  setLeads(leads);
+  renderAll();
+}
+
+function renderSavedLeads() {
+  const leads = getLeads();
+  const box = document.getElementById("savedLeads");
+
+  if (!leads.length) {
+    box.innerHTML = "<div class='small'>No saved leads yet.</div>";
+    return;
+  }
+
+  box.innerHTML = "";
+  leads.forEach((lead, index) => {
+    const div = document.createElement("div");
+    div.className = "lead";
+    div.innerHTML = `
+      <div class="name">${lead.name || "Unnamed Lead"}</div>
+      <div class="small">${lead.phone || ""}</div>
+      <div class="small">${lead.company || ""}</div>
+      <div class="small">Result: ${lead.result || "None"}</div>
+      <div class="small">Callback: ${(lead.callbackDate || "")} ${(lead.callbackTime || "")}</div>
+      <div class="small">Saved: ${lead.savedAt || ""}</div>
+      <div class="small">Notes: ${lead.notes || ""}</div>
+      <div class="lead-actions">
+        <button class="green small-btn" onclick="dialSaved(${index})">CALL</button>
+        <button class="blue small-btn" onclick="loadLead(${index})">LOAD</button>
+        <button class="red small-btn" onclick="deleteLead(${index})">DELETE</button>
+      </div>
+    `;
+    box.appendChild(div);
+  });
+}
+
+function renderCallbackQueue() {
+  const leads = getLeads().filter(l => l.result === "Callback" || l.callbackDate || l.callbackTime);
+  const box = document.getElementById("callbackQueue");
+
+  if (!leads.length) {
+    box.innerHTML = "<div class='small'>No callbacks scheduled.</div>";
+    return;
+  }
+
+  box.innerHTML = "";
+  leads.forEach((lead) => {
+    const div = document.createElement("div");
+    div.className = "lead";
+    div.innerHTML = `
+      <div class="name">${lead.name || "Unnamed Lead"}</div>
+      <div class="small">${lead.phone || ""}</div>
+      <div class="small">Callback: ${(lead.callbackDate || "")} ${(lead.callbackTime || "")}</div>
+    `;
+    box.appendChild(div);
+  });
+}
+
+function updateStats() {
+  const leads = getLeads();
+  document.getElementById("statTotal").innerText = leads.length;
+  document.getElementById("statInterested").innerText = leads.filter(l => l.result === "Interested").length;
+  document.getElementById("statCallback").innerText = leads.filter(l => l.result === "Callback").length;
+  document.getElementById("statBooked").innerText = leads.filter(l => l.result === "Booked").length;
+  document.getElementById("statNoAnswer").innerText = leads.filter(l => l.result === "No Answer").length;
+  document.getElementById("statNotInterested").innerText = leads.filter(l => l.result === "Not Interested").length;
+}
+
+function exportJson() {
+  const data = JSON.stringify(getLeads(), null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ssag-leads.json";
+  a.click();
+}
+
+function exportCsv() {
+  const leads = getLeads();
+  if (!leads.length) return;
+
+  const headers = ["name","phone","company","notes","result","callbackDate","callbackTime","savedAt"];
+  const rows = [
+    headers.join(","),
+    ...leads.map(lead =>
+      headers.map(h => `"${String(lead[h] || "").replace(/"/g,'""')}"`).join(",")
+    )
+  ];
+
+  const blob = new Blob([rows.join("\n")], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "ssag-leads.csv";
+  a.click();
+}
+
+function clearAllLeads() {
+  if (!confirm("Delete all saved leads?")) return;
+  localStorage.removeItem("ssag_leads");
+  renderAll();
+}
+
+function renderAll() {
+  renderSavedLeads();
+  renderCallbackQueue();
+  updateStats();
+}
+
+loadSettings();
+renderAll();
 </script>
+
+</body>
+</html>

@@ -53,7 +53,8 @@ button {
 }
 
 </style></head><body>
-<div class="container"><h2>SSAG AI Call System</h2><input id="name" placeholder="Lead Name">
+<div role="note" style="padding:12px 16px;margin:10px;background:#fff4d6;color:#332600;border-radius:10px">One-Tap Dial opens your phone app; this page does not place calls automatically. Saved leads stay in this browser and do not sync to a shared CRM. Do not store sensitive customer information here.</div>
+<div class="container"><h2>SSAG Call Prep &amp; Lead Tracker</h2><input id="name" placeholder="Lead Name">
 <input id="phone" placeholder="Phone Number">
 <input id="company" placeholder="Company">
 <textarea id="notes" placeholder="Notes"></textarea><button class="green" onclick="dial()">ONE-TAP DIAL</button> <button class="blue" onclick="saveLead('Interested')">SAVE LEAD</button> <button class="orange" onclick="saveLead('Callback')">SAVE AS CALLBACK</button> <button class="gray" onclick="loadNext()">LOAD NEXT LEAD</button> <button class="red" onclick="clearForm()">CLEAR FORM</button>
